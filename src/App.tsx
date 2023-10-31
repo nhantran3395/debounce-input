@@ -1,4 +1,4 @@
-import { ChangeEvent, useCallback, useEffect, useMemo, useState } from "react";
+import { ChangeEvent, useCallback, useMemo, useState } from "react";
 import { debounce } from "lodash";
 
 import "./App.css";
@@ -9,10 +9,6 @@ function App() {
   const [suggestions, setSuggestions] = useState([]);
   const [query, setQuery] = useState("");
 
-  function onInputChange(event: ChangeEvent<HTMLInputElement>) {
-    setQuery(event.target.value);
-  }
-
   const getSuggestions = useCallback(async function (query: string) {
     if (!query) {
       return;
@@ -20,7 +16,6 @@ function App() {
 
     const res = await fetch(SUGGESTIONS_URL);
     const data = await res.json();
-
     console.log({ query, data });
     setSuggestions(data);
   }, []);
@@ -30,15 +25,17 @@ function App() {
     [getSuggestions],
   );
 
-  useEffect(() => {
-    getSuggestionsDebounce(query);
-  }, [getSuggestionsDebounce, query]);
+  function onInputChange(event: ChangeEvent<HTMLInputElement>) {
+    const newQuery = event.target.value;
+    setQuery(newQuery);
+    getSuggestionsDebounce(newQuery);
+  }
 
   return (
     <main>
       <h2>Search input debounce</h2>
       <section>
-        <input type={"text"} onChange={onInputChange} />
+        <input type={"text"} onChange={onInputChange} value={query} />
         <ul>
           {suggestions.map((suggestion) => (
             <li key={suggestion}>{suggestion}</li>
